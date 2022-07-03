@@ -34,5 +34,5 @@ const issueSchema = new Schema( //defines the structure
   { timestamps: true }
 );
 
-const Issue = mongoose.model("Issue", issueSchema); //blog model
+const Issue = mongoose.model("Issue", issueSchema); //issue model
 module.exports = Issue;
