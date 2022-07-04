@@ -129,7 +129,7 @@ app.post("/issues/created", (req, res) => {
         secure: false, // true for 465, false for other ports
         auth: {
           user: "codeinout@gmail.com", // generated ethereal user
-          pass: "gsuoxyuydycslgmw", // generated ethereal password
+          pass: process.env.GPASS, // generated ethereal password
         },
         tls: {
           rejectUnauthorized: false,
@@ -207,7 +207,7 @@ app.post("/issues/:id", isLoggedin, (req, res) => {
     secure: false, // true for 465, false for other ports
     auth: {
       user: "codeinout@gmail.com", // generated ethereal user
-      pass: "gsuoxyuydycslgmw", // generated ethereal password
+      pass: process.env.GPASS, // generated ethereal password
     },
     tls: {
       rejectUnauthorized: false,
