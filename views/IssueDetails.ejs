@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <%- include('./partials/bootstrapcdn.ejs') %>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="" />
+  </head>
+  <body>
+    <a href="/issues">Issues page</a>
+    <% const comp = issue.Complaint_description%> <% const s = new
+    Date(issue.createdAt).toLocaleString(undefined, {timeZone:'Asia/Kolkata'})%>
+    <% const date = new Date(issue.createdAt)%>
+    <p><%=issue.uname%></p>
+    <p><%=issue.mail%></p>
+    <p><%=issue.phone%></p>
+    <p><%=issue.issueID%></p>
+    <p><%=s%></p>
+    <p><%=issue.Complaint_description%></p>
+    <br />
+    <% if(issue.task_manger == ""){%>
+    <p>No Task manager is assigned yet</p>
+
+    <form action="/assign/<%=issue._id%>" method="POST">
+      <label for="taskmanager">Task Manager name</label>
+      <input
+        type="text"
+        class="form-control"
+        name="taskmanager"
+        id="taskmanager"
+        aria-describedby="emailHelp"
+        placeholder="Enter name"
+        required
+      />
+      <label for="taskmanagermail">Task Manager name</label>
+      <input
+        type="email"
+        class="form-control"
+        name="taskmanagermail"
+        id="taskmanagermail"
+        aria-describedby="emailHelp"
+        placeholder="Enter mail"
+        required
+      />
+      <button
+        class="btn btn-primary assign-task-manager"
+        data-doc="<%= issue._id %>"
+      >
+        Assign task manager
+      </button>
+    </form>
+
+    <%} else {%>
+    <p>Task manager assigned : <%= issue.task_manger%></p>
+    <p>Task manager mail : <%= issue.task_manger_mail%></p>
+    <%}%> <%if(!issue.taskmanger_mail_sent && issue.task_manger_mail==""){%>
+    <p></p>
+    <%}else if(!issue.taskmanger_mail_sent && issue.task_manger_mail!=""){%>
+    <form action="/issues/<%=issue.id%>" method="POST">
+      <input type="hidden" name="uname" id="uname" />
+      <input type="hidden" name="tomail" id="tomail" />
+      <input type="hidden" name="issueID" id="issueID" />
+      <input type="hidden" name="comp_desc" id="comp_desc" />
+      <input type="hidden" name="date_registered" id="date_registered" />
+      <input
+        type="hidden"
+        class="form-control"
+        name="task_manager_name"
+        id="task_manager_name"
+        aria-describedby="emailHelp"
+        placeholder="Enter name"
+        required
+      />
+      <input
+        type="hidden"
+        class="form-control"
+        name="task_manager_mail"
+        id="task_manager_mail"
+        aria-describedby="emailHelp"
+        placeholder="Enter mail"
+        required
+      />
+      <button class="btn btn-primary">send mail to task manager</button>
+    </form>
+    <%}else{%>
+    <button class="btn btn-success">Mail sent to Task Manager</button>
+    <%}%>
+
+    <br />
+    <br />
+    <button class="btn btn-danger delete" data-doc="<%= issue._id %>">
+      delete this issue
+    </button>
+    <script>
+      const trash = document.querySelector("button.delete");
+      trash.addEventListener("click", (e) => {
+        const endpoint = `/issues/${trash.dataset.doc}`;
+        fetch(endpoint, {
+          method: "DELETE",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // console.log(data);
+            window.location.href = data.redirect;
+          })
+          .catch((e) => console.log(e));
+      });
+      document.getElementById("uname").value = "<%=issue.uname%>";
+      document.getElementById("tomail").value = "<%=issue.mail%>";
+      document.getElementById("issueID").value = "<%=issue.issueID%>";
+      document.getElementById("date_registered").value = "<%=s%>";
+      document.getElementById("comp_desc").value = `<%=comp%>`;
+      document.getElementById(
+        "task_manager_name"
+      ).value = `<%=issue.task_manger%>`;
+      document.getElementById(
+        "task_manager_mail"
+      ).value = `<%=issue.task_manger_mail%>`;
+    </script>
+  </body>
+</html>

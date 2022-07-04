@@ -7,11 +7,14 @@ const localStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
 
 const Issue = require("./models/isssue");
 const User = require("./models/user");
+// const { countDocuments } = require("./models/isssue");
 
 const app = express();
+
 dotenv.config();
 
 const dbURL = process.env.dbURL;
@@ -112,7 +115,46 @@ app.post("/issues/created", (req, res) => {
   issue
     .save()
     .then((result) => {
-      res.render("issueCreated", { issue: result });
+      const output = `<p> Thank you ${req.body.uname} for bringing the isuue to our notice , we have started to work on it</p>
+  <p>Regards</p>
+  <p>Manager</p>
+  <p>Department of Safety and Management</p>
+  `;
+
+      // create reusable transporter object using the default SMTP transport
+      let transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: "codeinout@gmail.com", // generated ethereal user
+          pass: "gsuoxyuydycslgmw", // generated ethereal password
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+      });
+
+      // setup email data with unicode symbols
+      let mailOptions = {
+        from: '"New Issue Registered" <codeinout@gmail.com>', // sender address
+        to: `${req.body.mail}`, // list of receivers
+        subject: "Work in Progress", // Subject line
+        text: "Hello world?", // plain text body
+        html: output, // html body
+      };
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.log(error);
+        }
+        console.log("Message sent: %s", info.messageId);
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+        res.render("issueCreated", { issue: result });
+        // res.render('contact', {msg:'Email has been sent'});
+      });
     })
     .catch((err) => {
       console.log("error: " + err.message);
@@ -128,6 +170,101 @@ app.get("/issues", isLoggedin, (req, res) => {
     .catch((error) => {
       console.log(error);
     });
+});
+
+app.get("/issues/:id", isLoggedin, (req, res) => {
+  Issue.findById(req.params.id)
+    .then((result) => {
+      console.log(result);
+      res.render("issueDetails", {
+        title: "All Issues",
+        issue: result,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+app.post("/issues/:id", isLoggedin, (req, res) => {
+  console.log("ISSUE ID", req.body);
+  const id = req.params.id;
+  const output = `<p> You have a new complaint to work on</p>
+  <h3>Details</h3>
+  <ul>
+  <li>Complaint registered by :${req.body.uname} </li>
+  <li>User mail ID :${req.body.tomail} </li>
+  <li>Complaint description:${req.body.comp_desc} </li>
+  <li>Date of complaint registered:${req.body.date_registered} </li>
+  <h3>Kindly revert with the progress of the issue </h3>
+  </ul>
+  `;
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: "codeinout@gmail.com", // generated ethereal user
+      pass: "gsuoxyuydycslgmw", // generated ethereal password
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+    from: '"New Issue Registered" <codeinout@gmail.com>', // sender address
+    to: `${req.body.task_manager_mail}`, // list of receivers
+    subject: "Complaint details", // Subject line
+    text: "Hello world?", // plain text body
+    html: output, // html body
+  };
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Message sent: %s", info.messageId);
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+    Issue.findByIdAndUpdate(id, {
+      taskmanger_mail_sent: true,
+    }).then((result) => {
+      res.redirect(`/issues/${id}`);
+    });
+
+    // res.redirect(`/issues/${req.params.id}`);
+    // res.render('contact', {msg:'Email has been sent'});
+  });
+});
+
+app.delete("/issues/:id", (req, res) => {
+  const id = req.params.id;
+  Issue.findByIdAndDelete(id)
+    .then((result) => {
+      res.json({ redirect: "/issues" });
+    })
+    .catch((e) => console.log(e));
+});
+
+app.post("/assign/:id", (req, res) => {
+  const id = req.params.id;
+  console.log(req.body);
+  Issue.findByIdAndUpdate(id, {
+    task_manger: `${req.body.taskmanager}`,
+    task_manger_mail: `${req.body.taskmanagermail}`,
+  }).then((result) => {
+    res.redirect(`/issues/${id}`);
+  });
+
+  // Issue.findByIdAndUpdate(id , {})
+  //   .then((result) => {
+  //     res.json({ redirect: "/issues" });
+  //   })
+  //   .catch((e) => console.log(e));
 });
 
 app.get("/login", isLoggedout, (req, res) => {

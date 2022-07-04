@@ -10,6 +10,7 @@ const issueSchema = new Schema( //defines the structure
     mail: {
       type: String,
       required: true,
+      unique: true,
     },
     phone: {
       type: String,
@@ -29,6 +30,18 @@ const issueSchema = new Schema( //defines the structure
     Complaint_description: {
       type: String,
       required: true,
+    },
+    task_manger: {
+      type: String,
+      default: "",
+    },
+    task_manger_mail: {
+      type: String,
+      default: "",
+    },
+    taskmanger_mail_sent: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

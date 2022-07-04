@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="" />
   </head>
   <body>
+    <a href="/">Home</a>
+    Thankyou for filling out the form , we will start working on it.
     <!-- Button trigger modal -->
     <button
       type="button"
@@ -65,6 +67,8 @@
             <p><%=issue.uname%></p>
             <h6>User mail ID:</h6>
             <p><%=issue.mail%></p>
+            <h6>IMG:</h6>
+            <p><%=issue.img%></p>
             <% const date = new Date(issue.createdAt)%>
             <h6>Date:</h6>
             <i><%=date.toDateString()%></i>
