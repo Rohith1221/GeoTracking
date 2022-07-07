@@ -10,7 +10,6 @@ const issueSchema = new Schema( //defines the structure
     mail: {
       type: String,
       required: true,
-      unique: true,
     },
     phone: {
       type: String,

@@ -2,13 +2,13 @@
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
     function (position) {
-      console.log(position);
+      // console.log(position);
       const { latitude } = position.coords;
       const { longitude } = position.coords;
       // const  latitude  = 40.3399;   //testing
       // const  longitude  = 117.321;
-      console.log("Latitude: " + latitude, "Longitude: " + longitude);
-      console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
+      // console.log("Latitude: " + latitude, "Longitude: " + longitude);
+      // console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
       const coord = [latitude, longitude];
 
       var map = L.map("map").setView(coord, 13);
@@ -41,7 +41,7 @@ if (navigator.geolocation)
         .addTo(map);
 
       //jquery getting longitude and latitude coordinates and passing into input fields
-      console.log("jquery");
+      // console.log("jquery");
       document.getElementById("longitude").value = `${coord[1]}`;
       document.getElementById("latitude").value = `${coord[0]}`;
 
